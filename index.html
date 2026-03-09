@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyroHawk — Wildfire Prevention Drone</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fire: #FF4500;
+    --bg: #141414;
+    --card: #1e1e1e;
+    --border: #2e2e2e;
+    --text: #e8e4dc;
+    --muted: #888;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 300;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 1.25rem 6vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(20,20,20,0.95);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 0.08em;
+  }
+
+  .nav-logo span { color: var(--fire); }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--fire); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    padding: 10rem 6vw 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fire);
+    border: 1px solid rgba(255,69,0,0.3);
+    padding: 0.3rem 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4.5rem, 12vw, 10rem);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 span { color: var(--fire); }
+
+  .hero-desc {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: var(--muted);
+    max-width: 480px;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+  }
+
+  .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+
+  .stat {
+    padding: 1.25rem 2rem;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat:last-child { border-right: none; }
+
+  .stat-n {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    color: var(--fire);
+    line-height: 1;
+  }
+
+  .stat-l {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+  }
+
+  /* PHOTO */
+  .photo-section {
+    padding: 5rem 6vw;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    border-top: 1px solid var(--border);
+  }
+
+  .photo-wrap { position: relative; }
+
+  .photo-wrap img {
+    width: 100%;
+    border-radius: 3px;
+    display: block;
+    filter: contrast(1.05) saturate(0.85);
+  }
+
+  .photo-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(20,20,20,0.85);
+    padding: 0.75rem 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .photo-text h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+  }
+
+  .photo-text h2 span { color: var(--fire); }
+
+  .photo-text p {
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+  }
+
+  /* SECTION HEADER */
+  .section-head { margin-bottom: 2.5rem; }
+
+  .section-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fire);
+    margin-bottom: 0.5rem;
+  }
+
+  .section-head h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1;
+  }
+
+  .section-head h2 span { color: var(--fire); }
+
+  /* HOW IT WORKS */
+  .how-section {
+    padding: 5rem 6vw;
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+  }
+
+  .how-card {
+    background: var(--card);
+    padding: 2rem;
+  }
+
+  .how-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: rgba(255,69,0,0.18);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+  }
+
+  .how-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.75rem;
+  }
+
+  .how-body {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* DROPPER */
+  .dropper-section {
+    padding: 5rem 6vw;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dropper-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 0.5rem;
+  }
+
+  .dropper-diagram {
+    position: sticky;
+    top: 5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 1.5rem;
+  }
+
+  .dropper-diagram svg { width: 100%; height: auto; display: block; }
+
+  .diagram-caption {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 1rem;
+    text-transform: uppercase;
+  }
+
+  .steps { display: flex; flex-direction: column; }
+
+  .step {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .step:first-child { padding-top: 0; }
+
+  .step-n {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    color: var(--border);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 1.8rem;
+    transition: color 0.25s;
+  }
+
+  .step:hover .step-n { color: var(--fire); }
+
+  .step-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    margin-top: 0.2rem;
+  }
+
+  .step-body {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+
+  /* COST */
+  .cost-section {
+    padding: 5rem 6vw;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cost-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+
+  .cost-card { background: var(--card); padding: 2rem; }
+
+  .cost-card.hl {
+    background: rgba(255,69,0,0.05);
+    position: relative;
+  }
+
+  .cost-card.hl::after {
+    content: 'PyroHawk';
+    position: absolute;
+    top: 1rem; right: 1rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    color: var(--fire);
+    text-transform: uppercase;
+  }
+
+  .cost-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+
+  .cost-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+
+  .cost-price span { color: var(--fire); }
+
+  .cost-unit {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .cost-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .cost-list li {
+    font-size: 0.85rem;
+    color: var(--muted);
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .cost-list li::before {
+    content: '-';
+    position: absolute;
+    left: 0;
+    color: var(--fire);
+  }
+
+  .bom-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fire);
+    margin-bottom: 1rem;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 0.65rem 0.75rem;
+    color: #999;
+    border-bottom: 1px solid #1e1e1e;
+  }
+
+  tr:hover td { color: var(--text); }
+  td:first-child { color: var(--text); font-weight: 400; }
+
+  /* ROADMAP */
+  .roadmap-section {
+    padding: 5rem 6vw;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tracks {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 0.5rem;
+  }
+
+  .track-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fire);
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+
+  .milestone {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .m-n {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    color: var(--border);
+    line-height: 1;
+    flex-shrink: 0;
+    width: 2rem;
+    text-align: center;
+    transition: color 0.25s;
+  }
+
+  .milestone:hover .m-n { color: var(--fire); }
+
+  .m-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+    margin-top: 0.2rem;
+  }
+
+  .m-body {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 2.5rem 6vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .foot-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+  }
+
+  .foot-logo span { color: var(--fire); }
+
+  .foot-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 768px) {
+    .photo-section, .dropper-layout, .tracks { grid-template-columns: 1fr; }
+    .how-grid { grid-template-columns: 1fr; }
+    .cost-cards { grid-template-columns: 1fr; }
+    .dropper-diagram { position: static; }
+    .nav-links { display: none; }
+    .stats-row { flex-direction: column; width: 100%; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">PYRO<span>HAWK</span></div>
+  <ul class="nav-links">
+    <li><a href="#how">How It Works</a></li>
+    <li><a href="#dropper">Mechanism</a></li>
+    <li><a href="#cost">Cost</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="tag">Cooper Summer STEM &nbsp;·&nbsp; Wildfire Prevention</div>
+  <h1>PYRO<span>HAWK</span></h1>
+  <p class="hero-desc">A drone that autonomously drops fire pellets at GPS coordinates to carry out prescribed burns, without putting any crew in the field.</p>
+  <div class="stats-row">
+    <div class="stat">
+      <div class="stat-n">+14K</div>
+      <div class="stat-l">More wildfires 2024 to 2025</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">-16%</div>
+      <div class="stat-l">Burn severity with prescribed fire</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n">-14%</div>
+      <div class="stat-l">Emissions reduction</div>
+    </div>
+  </div>
+</section>
+
+<!-- PHOTO -->
+<section class="photo-section">
+  <div class="photo-wrap">
+    <img src="1772994049009_image.png" alt="Heavy-lift drone with pellet dispenser payload" />
+    <div class="photo-label">Reference concept — hexacopter with pellet dispenser payload</div>
+  </div>
+  <div class="photo-text">
+    <h2>The <span>Problem</span></h2>
+    <p>Prescribed burning works. Studies show it reduces burn severity by around 16% and cuts emissions by around 14%. The issue is that doing it requires crews to go into rough, hard to reach terrain, which makes the process slow and expensive.</p>
+    <p>PyroHawk is my attempt to fix that. Instead of sending people in, the drone flies to the target area and drops ignited pellets at specific GPS coordinates. The whole thing runs autonomously, no one has to enter the burn zone.</p>
+    <p>The image above shows a similar existing concept, a heavy lift drone carrying a pellet dispenser underneath. PyroHawk builds on this with a custom dropper mechanism and a full AI navigation stack.</p>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-head">
+    <div class="section-tag">System Overview</div>
+    <h2>How It <span>Works</span></h2>
+  </div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Airframe</div>
+      <div class="how-body">Built on an Echo 5" frame with four Readytosky RS2205 motors and HQProp 3-blade propellers. The SpeedyBee V5 flight stack sits on vibration damping pads at the center. A GPS module feeds position data to the flight controller.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">Pellet Dropper</div>
+      <div class="how-body">A conical hopper feeds pellets one at a time through a servo controlled gate. Each pellet goes down a ceramic tube, gets clamped, lit by a nichrome wire ignition system, then dropped at the target. Everything in the drop path is fire resistant.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">AI Navigation</div>
+      <div class="how-body">A Swin-UNet vision model reads the camera feed and maps the terrain. A modified TrailNet model takes that map and picks a target coordinate. ArduPilot then flies the drone there using MAVLink in Guided Flight Mode. The loop repeats automatically.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">04</div>
+      <div class="how-title">Onboard Computer</div>
+      <div class="how-body">A Jetson Orin-Nano handles all the AI processing on board in real time. It runs the terrain model, the navigation model, and communicates with the flight controller at the same time, all without any ground input.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">05</div>
+      <div class="how-title">Ignition Safety</div>
+      <div class="how-body">The ignition system uses Arduino controlled relays to fire nichrome wire for a set duration, then cut power before the pellet drops. Ignition is tested completely separately from the drone in a safe environment, never during flight tests.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">06</div>
+      <div class="how-title">CAD Design</div>
+      <div class="how-body">The full mechanical layout is being designed in Fusion 360 before any parts are built. This includes the hopper, servo mount, release gate, and bracket placements. The 3D printed parts use PA6-CF filament for heat resistance.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DROPPER MECHANISM -->
+<section class="dropper-section" id="dropper">
+  <div class="section-head">
+    <div class="section-tag">Payload Detail</div>
+    <h2>Pellet Drop <span>Mechanism</span></h2>
+  </div>
+  <div class="dropper-layout">
+    <div class="dropper-diagram">
+      <svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="20,10 180,10 155,95 45,95" fill="#242424" stroke="#3a3a3a" stroke-width="1.5"/>
+        <circle cx="80" cy="40" r="9" fill="#FF4500" opacity="0.75"/>
+        <circle cx="100" cy="35" r="9" fill="#FF5520" opacity="0.75"/>
+        <circle cx="120" cy="40" r="9" fill="#FF4500" opacity="0.75"/>
+        <circle cx="90" cy="55" r="9" fill="#FF4A10" opacity="0.75"/>
+        <circle cx="112" cy="54" r="9" fill="#FF4500" opacity="0.75"/>
+        <text x="100" y="88" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="#555" letter-spacing="1">HOPPER</text>
+        <rect x="45" y="95" width="110" height="45" fill="#1e1e1e" stroke="#3a3a3a" stroke-width="1.5"/>
+        <rect x="60" y="103" width="35" height="28" rx="2" fill="#141414" stroke="#FF4500" stroke-width="1"/>
+        <line x1="95" y1="117" x2="120" y2="126" stroke="#FF4500" stroke-width="2"/>
+        <circle cx="120" cy="126" r="3" fill="#FF4500"/>
+        <text x="100" y="130" text-anchor="middle" font-family="IBM Plex Mono" font-size="7" fill="#555" letter-spacing="1">SERVO GATE</text>
+        <rect x="82" y="140" width="36" height="100" rx="1" fill="#181818" stroke="#3a3a3a" stroke-width="1.5"/>
+        <text x="140" y="193" font-family="IBM Plex Mono" font-size="7" fill="#555" letter-spacing="1">CERAMIC</text>
+        <text x="140" y="203" font-family="IBM Plex Mono" font-size="7" fill="#555" letter-spacing="1">TUBE</text>
+        <circle cx="100" cy="185" r="11" fill="#FF4500" opacity="0.8"/>
+        <path d="M68 215 Q100 208 132 215" stroke="#FF8C00" stroke-width="1.5" fill="none" stroke-dasharray="3,2"/>
+        <text x="30" y="220" font-family="IBM Plex Mono" font-size="6.5" fill="#FF8C00" letter-spacing="1">IGNITION</text>
+        <rect x="78" y="240" width="44" height="26" rx="2" fill="#1e1e1e" stroke="#3a3a3a" stroke-width="1.5"/>
+        <line x1="78" y1="253" x2="65" y2="253" stroke="#444" stroke-width="2"/>
+        <line x1="122" y1="253" x2="135" y2="253" stroke="#444" stroke-width="2"/>
+        <text x="100" y="257" text-anchor="middle" font-family="IBM Plex Mono" font-size="6.5" fill="#555" letter-spacing="1">CLAMP</text>
+        <line x1="100" y1="268" x2="100" y2="295" stroke="#FF4500" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <polygon points="95,292 105,292 100,302" fill="#FF4500"/>
+        <circle cx="100" cy="325" r="11" fill="#FF4500" opacity="0.5"/>
+        <circle cx="100" cy="355" r="9" fill="#FF4500" opacity="0.25"/>
+        <circle cx="100" cy="382" r="7" fill="#FF4500" opacity="0.1"/>
+        <text x="118" y="329" font-family="IBM Plex Mono" font-size="7" fill="#FF4500" letter-spacing="1">DROP</text>
+      </svg>
+      <div class="diagram-caption">Pellet flow — side cross section</div>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div>
+          <div class="step-title">Hopper Storage</div>
+          <div class="step-body">Wood pellets sit in the conical hopper and fall by gravity toward the exit at the bottom. The shape keeps them in a single file line so they feed consistently.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div>
+          <div class="step-title">Servo Gate</div>
+          <div class="step-body">An MG996R servo pushes one pellet at a time into the drop tube using a small lever, then resets to block the next one. This makes sure only one pellet drops per cycle.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div>
+          <div class="step-title">Ceramic Drop Tube</div>
+          <div class="step-body">The pellet slides down a ceramic tube into a clamp at the bottom. Ceramic is used here because it can handle the heat from ignition without getting damaged.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div>
+          <div class="step-title">Nichrome Ignition</div>
+          <div class="step-body">While the pellet is held in the clamp, an Arduino controlled relay sends power to nichrome wire wrapped around it. The wire heats up and lights the pellet. The relay cuts power before the clamp opens.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div>
+          <div class="step-title">Drop</div>
+          <div class="step-body">The clamp releases and the pellet falls to the GPS target below. ArduPilot records the drop and the AI model picks the next location. The cycle repeats until the mission is done.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COST -->
+<section class="cost-section" id="cost">
+  <div class="section-head">
+    <div class="section-tag">Cost</div>
+    <h2>Cost <span>Comparison</span></h2>
+  </div>
+  <div class="cost-cards">
+    <div class="cost-card">
+      <div class="cost-label">Traditional Prescribed Burn</div>
+      <div class="cost-price">$<span>1,500</span>+</div>
+      <div class="cost-unit">per acre, requires ground crew</div>
+      <ul class="cost-list">
+        <li>Crew has to go into the burn area</li>
+        <li>Dependent on weather and crew schedules</li>
+        <li>High transport and equipment costs</li>
+        <li>Hard to scale to large or remote areas</li>
+      </ul>
+    </div>
+    <div class="cost-card hl">
+      <div class="cost-label">PyroHawk</div>
+      <div class="cost-price"><span>Lower</span></div>
+      <div class="cost-unit">per acre, no crew needed on the ground</div>
+      <ul class="cost-list">
+        <li>Nobody enters the burn zone</li>
+        <li>Can reach terrain that crews cannot</li>
+        <li>Hardware cost spreads across many missions</li>
+        <li>Multiple drones can run at the same time</li>
+      </ul>
+    </div>
+  </div>
+
+  <div>
+    <div class="bom-label">Bill of Materials — Key Components</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Part</th>
+          <th>Source</th>
+          <th>Category</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Flight Computer</td><td>Jetson Orin-Nano</td><td>Amazon</td><td>AI Compute</td></tr>
+        <tr><td>Frame</td><td>Echo 5" Frame</td><td>ImpulseRC</td><td>Airframe</td></tr>
+        <tr><td>Flight Stack</td><td>SpeedyBee V5</td><td>SpeedyBee</td><td>Electronics</td></tr>
+        <tr><td>Motors x4</td><td>Readytosky RS2205</td><td>Amazon</td><td>Propulsion</td></tr>
+        <tr><td>Propellers</td><td>HQProp 3-blade</td><td>HQProp</td><td>Propulsion</td></tr>
+        <tr><td>Servo</td><td>MG996R</td><td>TowerPro</td><td>Pellet Dropper</td></tr>
+        <tr><td>Ignition MCU</td><td>Arduino Pro Mini 16MHz 5V</td><td>eBay</td><td>Ignition</td></tr>
+        <tr><td>Main MCU</td><td>Arduino ESP32</td><td>Amazon</td><td>Control</td></tr>
+        <tr><td>Ignition Wire</td><td>Nichrome + Relay Board</td><td>eBay</td><td>Ignition</td></tr>
+        <tr><td>Battery</td><td>LiPo XT-60</td><td>HobbyKing</td><td>Power</td></tr>
+        <tr><td>Payload</td><td>Wood Pellets</td><td>Amazon</td><td>Fire Agent</td></tr>
+        <tr><td>Housing</td><td>PA6-CF Filament, 3D printed</td><td>School Lab</td><td>Structure</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="roadmap-section" id="roadmap">
+  <div class="section-head">
+    <div class="section-tag">Development Plan</div>
+    <h2>Build <span>Roadmap</span></h2>
+  </div>
+  <div class="tracks">
+    <div>
+      <div class="track-label">Mechanical</div>
+      <div class="milestone">
+        <div class="m-n">1</div>
+        <div>
+          <div class="m-title">CAD in Fusion 360</div>
+          <div class="m-body">Model the full mechanical layout including the hopper, servo mount, release gate, and wiring paths. Lets us check spacing and balance before ordering parts.</div>
+        </div>
+      </div>
+      <div class="milestone">
+        <div class="m-n">2</div>
+        <div>
+          <div class="m-title">Drone Assembly and Testing</div>
+          <div class="m-body">Put together the airframe with motors, flight stack, GPS, and battery. Test that it flies stable and can handle the weight of the full payload.</div>
+        </div>
+      </div>
+      <div class="milestone">
+        <div class="m-n">3</div>
+        <div>
+          <div class="m-title">Build the Pellet Dropper</div>
+          <div class="m-body">3D print the hopper and drop tube in PA6-CF filament. Attach the servo gate and run tests to confirm single pellet release works correctly.</div>
+        </div>
+      </div>
+      <div class="milestone">
+        <div class="m-n">4</div>
+        <div>
+          <div class="m-title">Full Assembly</div>
+          <div class="m-body">Mount the dropper onto the drone frame and make sure everything fits. No rotor interference. Drone is ready for software testing at this point.</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="track-label">Software</div>
+      <div class="milestone">
+        <div class="m-n">1</div>
+        <div>
+          <div class="m-title">Modify TrailNet</div>
+          <div class="m-body">Add a depth estimation layer and new output heads for Gap Center, Object Proximity, and a danger score. Get it ready to train on the FinnWoodlands Dataset.</div>
+        </div>
+      </div>
+      <div class="milestone">
+        <div class="m-n">2</div>
+        <div>
+          <div class="m-title">ArduPilot Setup and TrailNet Training</div>
+          <div class="m-body">Set up MAVLink and Guided Flight Mode in ArduPilot. Train the TrailNet model and run accuracy tests. Finalize the weights.</div>
+        </div>
+      </div>
+      <div class="milestone">
+        <div class="m-n">3</div>
+        <div>
+          <div class="m-title">Train Swin-UNet and Connect Pipeline</div>
+          <div class="m-body">Train the Swin-UNet model on its own, then connect it to TrailNet. Run the full AI pipeline on the Jetson Orin-Nano and link it to ArduPilot.</div>
+        </div>
+      </div>
+      <div class="milestone">
+        <div class="m-n">4</div>
+        <div>
+          <div class="m-title">Full Integration Testing</div>
+          <div class="m-body">Run the whole autonomous loop on the finished drone. Test vision to navigation to drop from start to finish. Fix any issues. No ignition during these tests.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-logo">PYRO<span>HAWK</span></div>
+  <div class="foot-note">Jiho Lee &nbsp;·&nbsp; Cooper Summer STEM Application &nbsp;·&nbsp; 2026</div>
+</footer>
+
+</body>
+</html>
